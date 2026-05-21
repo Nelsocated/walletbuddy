@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-primary: #0c5240;
+  --color-secondary: #0defa2;
+  --color-background: #001012;
+  --color-back1: #0b1a1c;
+  --color-back2: #152426;
+  --color-textWhite: #eef4f5;
+  --color-error: #f44336;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --text-header: 50px;
+  --text-subheader: 46px;
+  --text-title: 40px;
+  --text-subtitle: 36px;
+  --text-upsize: 26px;
+  --text-normal: 22px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--color-background);
+  border: var(--color-primary);
+  border-radius: 24px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-primary);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+body {
+  scrollbar-gutter: stable;
+}
+
+.scroll-stable {
+  scrollbar-gutter: stable;
 }
