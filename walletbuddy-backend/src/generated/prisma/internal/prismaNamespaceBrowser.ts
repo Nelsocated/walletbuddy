@@ -101,7 +101,6 @@ export const BudgetScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   limit: 'limit',
-  remaining: 'remaining',
   period: 'period',
   createdAt: 'createdAt'
 } as const

@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -10,8 +11,8 @@ datasource db {
 model User {
   id          Int           @id @default(autoincrement())
   email       String        @unique
-  name        String?
-  balance     Float         @default(0)
+  name        String
+  balance     Int           @default(0)
   password    String
   createdAt   DateTime      @default(now())
   transaction Transaction[]
@@ -23,7 +24,7 @@ model Transaction {
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   type      Type
-  amount    Float
+  amount    Int
   category  Category
   note      String?
   createdAt DateTime @default(now())
@@ -33,8 +34,7 @@ model Budget {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int      @unique
-  limit     Float
-  remaining Float
+  limit     Int
   period    Period
   createdAt DateTime @default(now())
 }

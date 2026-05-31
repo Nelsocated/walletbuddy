@@ -1,16 +1,21 @@
 "use client";
 import { useState } from "react";
 import { SquarePen, X } from "lucide-react";
-import Input from "../Input";
-import Button from "../Button";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import { setLimit } from "../actions/budget";
 
-export default function SetBudgetModal() {
+export default function SetBudgetModal({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
   const [show, setShow] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [period, setPeriod] = useState("weekly");
+  const [amount, setAmount] = useState<number>(0);
+  const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
   const [error, setError] = useState("");
 
-  function setBudget(e: React.FormEvent) {
+  async function setBudget(e: React.FormEvent) {
     e.preventDefault();
 
     if (!amount || !period) {
@@ -22,10 +27,17 @@ export default function SetBudgetModal() {
     }
 
     setError("");
-    console.log({ amount, period });
-    setAmount("");
-    setPeriod("");
-    setShow(!show);
+    try {
+      await setLimit(amount, period);
+      onSuccess();
+      setShow(!show);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    }
   }
   return (
     <>
@@ -60,8 +72,8 @@ export default function SetBudgetModal() {
                   <Input
                     type="text"
                     inputMode="numeric"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={String(amount)}
+                    onChange={(e) => setAmount(Number(e.target.value))}
                     className="text-secondary"
                   />
                 </label>

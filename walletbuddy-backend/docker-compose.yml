@@ -7,9 +7,19 @@ services:
       POSTGRES_PASSWORD: 120lago114
       POSTGRES_DB: walletbuddy
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

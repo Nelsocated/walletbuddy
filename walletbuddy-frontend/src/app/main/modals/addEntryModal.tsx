@@ -1,18 +1,29 @@
 "use client";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import Button from "../Button";
-import Input from "../Input";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import {
+  addTr,
+  type TrCategory,
+  TransactionType,
+} from "../actions/transaction";
 
-export default function AddEntryModal() {
+export default function AddEntryModal({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
   const [show, setShow] = useState(false);
-  const [type, setType] = useState("expense");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
+  const [type, setType] = useState<TransactionType>("expense");
+  const [amount, setAmount] = useState<number>(0);
+  const [category, setCategory] = useState<TrCategory>(
+    type === "expense" ? "food" : "allowance",
+  );
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
 
-  function addEntry(e: React.FormEvent) {
+  async function addEntry(e: React.FormEvent) {
     e.preventDefault();
 
     if (!amount || !category) {
@@ -24,12 +35,24 @@ export default function AddEntryModal() {
     }
 
     setError("");
-    console.log({ type, amount, category, note });
-    setAmount("");
-    setCategory("");
-    setType("expense");
-    setNote("");
-    setShow(!show);
+
+    try {
+      await addTr({ type, amount, category, note });
+      onSuccess();
+      setAmount(0);
+      setCategory(type === "expense" ? "food" : "allowance");
+      setType("expense");
+      setNote("");
+      setTimeout(() => {
+        setShow(false);
+      }, 1500);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    }
   }
 
   return (
@@ -61,7 +84,7 @@ export default function AddEntryModal() {
                 className={`w-full hover:border-secondary hover:text-secondary`}
                 onClick={() => {
                   setType("expense");
-                  setCategory("");
+                  setCategory(type === "expense" ? "food" : "allowance");
                 }}
                 selected={type === "expense"}
               >
@@ -72,7 +95,7 @@ export default function AddEntryModal() {
                 className={`w-full hover:border-secondary hover:text-secondary`}
                 onClick={() => {
                   setType("income");
-                  setCategory("");
+                  setCategory(type === "expense" ? "food" : "allowance");
                 }}
                 selected={type === "income"}
               >
@@ -90,8 +113,8 @@ export default function AddEntryModal() {
                   <Input
                     type="text"
                     inputMode="numeric"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={String(amount)}
+                    onChange={(e) => setAmount(Number(e.target.value))}
                     className="text-secondary"
                   />
                 </label>
