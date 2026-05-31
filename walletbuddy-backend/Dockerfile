@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build && echo "BUILD SUCCESS" || (echo "BUILD FAILED" && exit 1)
+RUN npm run build && echo "BUILD SUCCESS" && ls -la dist/ || (echo "BUILD FAILED" && exit 1)
 
 EXPOSE 3000
 
