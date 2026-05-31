@@ -7,8 +7,9 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build || (echo "BUILD FAILED" && cat tsconfig.build.json && exit 1)
+RUN npx prisma generate
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
