@@ -19,9 +19,13 @@ let BudgetsService = class BudgetsService {
     }
     async getBudget(userId) {
         try {
-            const [budget, spent] = await Promise.all([
+            const [weekly, monthly, spent] = await Promise.all([
                 this.prisma.budget.findUnique({
-                    where: { userId },
+                    where: { userId, period: 'weekly' },
+                    select: { limit: true },
+                }),
+                this.prisma.budget.findUnique({
+                    where: { userId, period: 'monthly' },
                     select: { limit: true },
                 }),
                 this.prisma.transaction.aggregate({
@@ -29,9 +33,14 @@ let BudgetsService = class BudgetsService {
                     _sum: { amount: true },
                 }),
             ]);
-            const limit = budget?.limit ?? 0;
-            const remaining = limit - (spent._sum.amount ?? 0);
-            return { limit, remaining };
+            const weeklyLim = weekly?.limit ?? 0;
+            const monthlyLim = monthly?.limit ?? 0;
+            const weeklyRem = weeklyLim - (spent._sum.amount ?? 0);
+            const monthlyRem = monthlyLim - (spent._sum.amount ?? 0);
+            return {
+                limit: { weekly: weeklyLim, monthly: monthlyLim },
+                remaining: { weekly: weeklyRem, monthly: monthlyRem },
+            };
         }
         catch {
             throw new common_1.InternalServerErrorException('Failed to fetch budget.');

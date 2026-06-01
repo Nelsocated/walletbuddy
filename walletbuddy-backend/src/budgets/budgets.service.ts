@@ -6,13 +6,18 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BudgetsService {
   constructor(private prisma: PrismaService) {}
 
-  async getBudget(
-    userId: number,
-  ): Promise<{ limit: number; remaining: number }> {
+  async getBudget(userId: number): Promise<{
+    limit: { weekly: number; monthly: number };
+    remaining: { weekly: number; monthly: number };
+  }> {
     try {
-      const [budget, spent] = await Promise.all([
+      const [weekly, monthly, spent] = await Promise.all([
         this.prisma.budget.findUnique({
-          where: { userId },
+          where: { userId, period: 'weekly' },
+          select: { limit: true },
+        }),
+        this.prisma.budget.findUnique({
+          where: { userId, period: 'monthly' },
           select: { limit: true },
         }),
         this.prisma.transaction.aggregate({
@@ -21,10 +26,15 @@ export class BudgetsService {
         }),
       ]);
 
-      const limit = budget?.limit ?? 0;
-      const remaining = limit - (spent._sum.amount ?? 0);
+      const weeklyLim = weekly?.limit ?? 0;
+      const monthlyLim = monthly?.limit ?? 0;
+      const weeklyRem = weeklyLim - (spent._sum.amount ?? 0);
+      const monthlyRem = monthlyLim - (spent._sum.amount ?? 0);
 
-      return { limit, remaining };
+      return {
+        limit: { weekly: weeklyLim, monthly: monthlyLim },
+        remaining: { weekly: weeklyRem, monthly: monthlyRem },
+      };
     } catch {
       throw new InternalServerErrorException('Failed to fetch budget.');
     }

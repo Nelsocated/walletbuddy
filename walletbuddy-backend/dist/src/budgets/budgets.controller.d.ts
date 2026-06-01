@@ -4,8 +4,14 @@ export declare class BudgetsController {
     private btService;
     constructor(btService: BudgetsService);
     getBudget(userId: number): Promise<{
-        limit: number;
-        remaining: number;
+        limit: {
+            weekly: number;
+            monthly: number;
+        };
+        remaining: {
+            weekly: number;
+            monthly: number;
+        };
     }>;
     setLimit(body: {
         userId: number;

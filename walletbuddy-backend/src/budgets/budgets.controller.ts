@@ -14,9 +14,10 @@ export class BudgetsController {
   constructor(private btService: BudgetsService) {}
 
   @Get(':userId')
-  async getBudget(
-    @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<{ limit: number; remaining: number }> {
+  async getBudget(@Param('userId', ParseIntPipe) userId: number): Promise<{
+    limit: { weekly: number; monthly: number };
+    remaining: { weekly: number; monthly: number };
+  }> {
     return this.btService.getBudget(userId);
   }
 
